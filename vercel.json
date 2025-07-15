@@ -1,0 +1,18 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "build": {
+    "env": {
+      "SKIP_TYPE_CHECK": "true",
+      "DISABLE_ESLINT": "true",
+      "NODE_ENV": "production"
+    }
+  },
+  "redirects": [
+    {
+      "source": "/admin",
+      "destination": "/admin/dashboard",
+      "permanent": false
+    }
+  ]
+}

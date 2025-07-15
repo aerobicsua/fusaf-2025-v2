@@ -1,0 +1,16 @@
+{
+  "name": "ФУСАФ - Федерація України зі Спортивної Аеробіки і Фітнесу",
+  "short_name": "ФУСАФ",
+  "description": "Система управління членством та змаганнями",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8B5CF6",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
