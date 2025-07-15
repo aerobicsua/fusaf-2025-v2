@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,16 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [redirectTo, setRedirectTo] = useState<string | null>(null);
   const router = useRouter();
+
+  // Безпечно отримуємо redirect параметр після монтування
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      setRedirectTo(urlParams.get('redirect'));
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -83,7 +92,10 @@ export default function SignUpPage() {
       if (response.ok) {
         setSuccess(true);
         setTimeout(() => {
-          router.push('/auth/signin?message=registration-success');
+          const signinUrl = redirectTo
+            ? `/auth/signin?message=registration-success&redirect=${encodeURIComponent(redirectTo)}`
+            : '/auth/signin?message=registration-success';
+          router.push(signinUrl);
         }, 2000);
       } else {
         setError(data.error || 'Помилка реєстрації');
@@ -140,6 +152,15 @@ export default function SignUpPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {redirectTo && (
+              <Alert className="mb-4">
+                <UserPlus className="h-4 w-4" />
+                <AlertDescription>
+                  Створіть акаунт, щоб продовжити реєстрацію як спортсмен.
+                </AlertDescription>
+              </Alert>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
                 <Alert variant="destructive">
@@ -257,7 +278,10 @@ export default function SignUpPage() {
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Вже маєте обліковий запис?{' '}
-                <Link href="/auth/signin" className="text-orange-600 hover:text-orange-700 font-medium">
+                <Link
+                  href={`/auth/signin${redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`}
+                  className="text-orange-600 hover:text-orange-700 font-medium"
+                >
                   Увійти
                 </Link>
               </p>

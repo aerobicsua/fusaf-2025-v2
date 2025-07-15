@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signIn, getSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +17,16 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [redirectTo, setRedirectTo] = useState<string | null>(null);
   const router = useRouter();
+
+  // Безпечно отримуємо redirect параметр після монтування
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      setRedirectTo(urlParams.get('redirect'));
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,11 +47,16 @@ export default function SignInPage() {
         const session = await getSession();
         console.log('✅ Успішний вхід:', session?.user?.email);
 
-        // Перенаправляємо в залежності від ролі
-        if (session?.user?.roles?.includes('admin')) {
-          router.push('/admin');
+        // Якщо є redirect параметр, використовуємо його
+        if (redirectTo) {
+          router.push(redirectTo);
         } else {
-          router.push('/');
+          // Перенаправляємо в залежності від ролі
+          if (session?.user?.roles?.includes('admin')) {
+            router.push('/admin');
+          } else {
+            router.push('/');
+          }
         }
       }
     } catch (error) {
@@ -90,6 +104,15 @@ export default function SignInPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {redirectTo && (
+              <Alert className="mb-4">
+                <LogIn className="h-4 w-4" />
+                <AlertDescription>
+                  Для продовження реєстрації необхідно увійти в систему або створити новий акаунт.
+                </AlertDescription>
+              </Alert>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
                 <Alert variant="destructive">
@@ -154,7 +177,10 @@ export default function SignInPage() {
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Немає облікового запису?{' '}
-                <Link href="/auth/signup" className="text-orange-600 hover:text-orange-700 font-medium">
+                <Link
+                  href={`/auth/signup${redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`}
+                  className="text-orange-600 hover:text-orange-700 font-medium"
+                >
                   Зареєструватися
                 </Link>
               </p>

@@ -13,6 +13,7 @@ import {
   Award,
   CheckCircle,
   ArrowRight,
+  LogIn,
   Star,
   Trophy,
   Users
@@ -109,7 +110,16 @@ export default function MembershipPage() {
 
   const handleOptionSelect = (option: MembershipOption) => {
     setSelectedOption(option.id);
-    // Додаємо невелику затримку для візуального ефекту
+
+    // Якщо користувач не авторизований, перенаправляємо на авторизацію
+    if (!session) {
+      setTimeout(() => {
+        router.push(`/auth/signin?redirect=${encodeURIComponent(option.path)}`);
+      }, 200);
+      return;
+    }
+
+    // Якщо авторизований, переходимо на форму реєстрації
     setTimeout(() => {
       router.push(option.path);
     }, 200);
@@ -221,24 +231,19 @@ export default function MembershipPage() {
               <div className="text-center">
                 <User className="h-12 w-12 mx-auto mb-4 text-blue-600" />
                 <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                  Потрібна авторизація
+                  Увійдіть в систему
                 </h3>
                 <p className="text-blue-700 mb-4">
-                  Для реєстрації на членство необхідно спочатку увійти в систему або створити акаунт.
+                  Для продовження реєстрації оберіть тип членства вище і увійдіть в систему.
+                  Якщо у вас немає акаунту, його буде створено автоматично.
                 </p>
-                <div className="flex justify-center space-x-4">
+                <div className="flex justify-center">
                   <Button
                     onClick={() => router.push('/auth/signin')}
-                    variant="outline"
-                    className="border-blue-600 text-blue-600 hover:bg-blue-50"
-                  >
-                    Вхід
-                  </Button>
-                  <Button
-                    onClick={() => router.push('/auth/signup')}
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
-                    Реєстрація
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Увійти в систему
                   </Button>
                 </div>
               </div>

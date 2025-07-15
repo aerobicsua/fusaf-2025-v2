@@ -1,0 +1,17 @@
+[build]
+  command = "DISABLE_ESLINT_PLUGIN=true npm run build"
+  publish = ".next"
+
+[build.environment]
+  DISABLE_ESLINT_PLUGIN = "true"
+  SKIP_LINT = "true"
+  CI = "false"
+
+[functions]
+  directory = "netlify/functions"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"

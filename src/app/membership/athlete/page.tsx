@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -68,7 +68,7 @@ interface RegistrationData {
 }
 
 export default function AthleteRegistrationPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   const [formData, setFormData] = useState<RegistrationData>({
@@ -97,6 +97,30 @@ export default function AthleteRegistrationPage() {
   const [errors, setErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  // Оновлюємо email в формі коли сесія завантажується та відновлюємо збережені дані
+  useEffect(() => {
+    // Відновлюємо збережені дані форми з localStorage
+    const savedFormData = localStorage.getItem('athleteFormData');
+    if (savedFormData) {
+      try {
+        const parsedData = JSON.parse(savedFormData);
+        setFormData(prev => ({
+          ...prev,
+          ...parsedData,
+          email: session?.user?.email || parsedData.email // Переписуємо email з сесії
+        }));
+        localStorage.removeItem('athleteFormData'); // Очищаємо збережені дані
+      } catch (error) {
+        console.error('Помилка відновлення даних форми:', error);
+      }
+    } else if (session?.user?.email) {
+      setFormData(prev => ({
+        ...prev,
+        email: session.user.email || ''
+      }));
+    }
+  }, [session]);
 
   const validateForm = (): string[] => {
     const newErrors: string[] = [];
@@ -137,8 +161,11 @@ export default function AthleteRegistrationPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Перевіряємо авторизацію при відправці форми
     if (!session) {
-      router.push('/auth/signin');
+      // Зберігаємо дані форми в localStorage перед перенаправленням
+      localStorage.setItem('athleteFormData', JSON.stringify(formData));
+      router.push('/auth/signin?redirect=' + encodeURIComponent('/membership/athlete'));
       return;
     }
 
@@ -309,30 +336,7 @@ export default function AthleteRegistrationPage() {
             </Alert>
           )}
 
-          {!session ? (
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Shield className="h-5 w-5 mr-2 text-orange-600" />
-                  Необхідна авторизація
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">
-                  Для реєстрації як спортсмен необхідно спочатку увійти в систему або створити акаунт.
-                </p>
-                <div className="flex space-x-4">
-                  <Button onClick={() => router.push('/auth/signin')}>
-                    Увійти
-                  </Button>
-                  <Button variant="outline" onClick={() => router.push('/auth/signup')}>
-                    Створити акаунт
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-8">
 
               {/* Особисті дані */}
               <Card>
@@ -661,7 +665,6 @@ export default function AthleteRegistrationPage() {
                 </Button>
               </div>
             </form>
-          )}
 
           {/* Переваги та вимоги */}
           <div className="mt-16 grid md:grid-cols-2 gap-8">

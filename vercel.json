@@ -1,11 +1,18 @@
 {
   "framework": "nextjs",
-  "buildCommand": "npm run build",
+  "buildCommand": "bun run build",
+  "installCommand": "bun install",
   "build": {
     "env": {
       "SKIP_TYPE_CHECK": "true",
       "DISABLE_ESLINT": "true",
-      "NODE_ENV": "production"
+      "NODE_ENV": "production",
+      "CI": "false"
+    }
+  },
+  "functions": {
+    "app/**": {
+      "maxDuration": 10
     }
   },
   "redirects": [

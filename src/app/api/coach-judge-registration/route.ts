@@ -2,43 +2,61 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-// Інтерфейс для реєстрації спортсмена
-interface AthleteRegistration {
+// Інтерфейс для реєстрації тренера/судді
+interface CoachJudgeRegistration {
   id: string;
   userId: string;
   registrationDate: string;
   status: 'pending' | 'approved' | 'rejected';
+
+  // Особисті дані
   firstName: string;
   lastName: string;
   dateOfBirth: string;
   gender: string;
-  age: number;
+
+  // Контактна інформація
   email: string;
   phone: string;
   address: string;
   city: string;
+
+  // Професійна інформація
+  education: string;
+  specialization: string;
   experience: string;
-  category: string;
-  previousClub: string;
+  currentPosition: string;
+  workPlace: string;
+  certifications: string;
   achievements: string;
-  hasMedicalClearance: boolean;
-  medicalConditions: string;
+
+  // Тренерська/суддівська діяльність
+  coachingExperience: string;
+  judgingExperience: string;
+  preferredRole: string;
+  languageSkills: string;
+
+  // Контакт екстреної допомоги
   emergencyContact: {
     name: string;
     phone: string;
     relation: string;
   };
+
+  // Згоди
   consents: {
     dataProcessing: boolean;
     rulesAcceptance: boolean;
+    ethicsCodeAcceptance: boolean;
     photoConsent: boolean;
   };
+
   createdAt: string;
   updatedAt: string;
 }
 
-// Мок сховище для реєстрацій спортсменів
-let athleteRegistrations: AthleteRegistration[] = [];
+// Мок сховище для реєстрацій тренерів/суддів
+let coachJudgeRegistrations: CoachJudgeRegistration[] = [];
 
 export async function POST(request: Request) {
   try {
@@ -56,8 +74,9 @@ export async function POST(request: Request) {
     // Валідація основних полів
     const requiredFields = [
       'firstName', 'lastName', 'dateOfBirth', 'gender',
-      'email', 'phone', 'city', 'experience', 'category',
-      'emergencyContactName', 'emergencyContactPhone', 'emergencyContactRelation'
+      'email', 'phone', 'city', 'education', 'specialization',
+      'experience', 'preferredRole', 'emergencyContactName',
+      'emergencyContactPhone', 'emergencyContactRelation'
     ];
 
     for (const field of requiredFields) {
@@ -84,6 +103,13 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!registrationData.ethicsCodeAcceptance) {
+      return NextResponse.json(
+        { error: 'Прийняття етичного кодексу обов\'язкове' },
+        { status: 400 }
+      );
+    }
+
     // Перевірка валідності email
     if (!/\S+@\S+\.\S+/.test(registrationData.email)) {
       return NextResponse.json(
@@ -92,41 +118,21 @@ export async function POST(request: Request) {
       );
     }
 
-    // Перевірка валідності телефону
-    if (!/^\+?[\d\s\-\(\)]+$/.test(registrationData.phone)) {
-      return NextResponse.json(
-        { error: 'Введіть коректний номер телефону' },
-        { status: 400 }
-      );
-    }
-
-    // Перевірка унікальності email для спортсменів
-    const existingRegistration = athleteRegistrations.find(
+    // Перевірка унікальності email для тренерів/суддів
+    const existingRegistration = coachJudgeRegistrations.find(
       reg => reg.email.toLowerCase() === registrationData.email.toLowerCase()
     );
 
     if (existingRegistration) {
       return NextResponse.json(
-        { error: 'Користувач з такою поштою вже зареєстрований як спортсмен' },
+        { error: 'Користувач з такою поштою вже зареєстрований як тренер/суддя' },
         { status: 409 }
       );
     }
 
-    // Перевірка віку
-    const birthDate = new Date(registrationData.dateOfBirth);
-    const today = new Date();
-    const age = today.getFullYear() - birthDate.getFullYear();
-
-    if (age < 6) {
-      return NextResponse.json(
-        { error: 'Мінімальний вік для реєстрації - 6 років' },
-        { status: 400 }
-      );
-    }
-
-    // Створюємо реєстрацію спортсмена
-    const athleteRegistration = {
-      id: `athlete_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    // Створюємо реєстрацію тренера/судді
+    const coachJudgeRegistration: CoachJudgeRegistration = {
+      id: `coach_judge_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       userId: session.user.id,
       registrationDate: new Date().toISOString(),
       status: 'pending', // pending, approved, rejected
@@ -136,7 +142,6 @@ export async function POST(request: Request) {
       lastName: registrationData.lastName.trim(),
       dateOfBirth: registrationData.dateOfBirth,
       gender: registrationData.gender,
-      age: age,
 
       // Контактна інформація
       email: registrationData.email.toLowerCase().trim(),
@@ -144,15 +149,20 @@ export async function POST(request: Request) {
       address: registrationData.address?.trim() || '',
       city: registrationData.city.trim(),
 
-      // Спортивна інформація
+      // Професійна інформація
+      education: registrationData.education,
+      specialization: registrationData.specialization,
       experience: registrationData.experience,
-      category: registrationData.category,
-      previousClub: registrationData.previousClub?.trim() || '',
+      currentPosition: registrationData.currentPosition?.trim() || '',
+      workPlace: registrationData.workPlace?.trim() || '',
+      certifications: registrationData.certifications?.trim() || '',
       achievements: registrationData.achievements?.trim() || '',
 
-      // Медична інформація
-      hasMedicalClearance: registrationData.hasMedicalClearance || false,
-      medicalConditions: registrationData.medicalConditions?.trim() || '',
+      // Тренерська/суддівська діяльність
+      coachingExperience: registrationData.coachingExperience || '',
+      judgingExperience: registrationData.judgingExperience || '',
+      preferredRole: registrationData.preferredRole,
+      languageSkills: registrationData.languageSkills?.trim() || '',
 
       // Контакт екстреної допомоги
       emergencyContact: {
@@ -165,6 +175,7 @@ export async function POST(request: Request) {
       consents: {
         dataProcessing: registrationData.dataProcessingConsent,
         rulesAcceptance: registrationData.rulesAcceptance,
+        ethicsCodeAcceptance: registrationData.ethicsCodeAcceptance,
         photoConsent: registrationData.photoConsent || false
       },
 
@@ -174,14 +185,14 @@ export async function POST(request: Request) {
     };
 
     // Зберігаємо реєстрацію
-    athleteRegistrations.push(athleteRegistration);
+    coachJudgeRegistrations.push(coachJudgeRegistration);
 
-    console.log('✅ Нова реєстрація спортсмена:', {
-      id: athleteRegistration.id,
-      email: athleteRegistration.email,
-      name: `${athleteRegistration.firstName} ${athleteRegistration.lastName}`,
-      category: athleteRegistration.category,
-      experience: athleteRegistration.experience
+    console.log('✅ Нова реєстрація тренера/судді:', {
+      id: coachJudgeRegistration.id,
+      email: coachJudgeRegistration.email,
+      name: `${coachJudgeRegistration.firstName} ${coachJudgeRegistration.lastName}`,
+      preferredRole: coachJudgeRegistration.preferredRole,
+      specialization: coachJudgeRegistration.specialization
     });
 
     // TODO: Відправити email підтвердження
@@ -190,17 +201,17 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: 'Реєстрацію спортсмена успішно завершено',
+      message: 'Заявку на статус тренера/судді успішно подано',
       registration: {
-        id: athleteRegistration.id,
-        registrationNumber: `FUSAF-ATH-${athleteRegistration.id.substr(-8).toUpperCase()}`,
-        status: athleteRegistration.status,
-        registrationDate: athleteRegistration.registrationDate
+        id: coachJudgeRegistration.id,
+        registrationNumber: `FUSAF-CJ-${coachJudgeRegistration.id.substr(-8).toUpperCase()}`,
+        status: coachJudgeRegistration.status,
+        registrationDate: coachJudgeRegistration.registrationDate
       }
     }, { status: 201 });
 
   } catch (error: any) {
-    console.error('❌ Помилка реєстрації спортсмена:', error);
+    console.error('❌ Помилка реєстрації тренера/судді:', error);
 
     return NextResponse.json(
       { error: 'Помилка сервера при реєстрації' },
@@ -221,7 +232,7 @@ export async function GET(request: Request) {
     }
 
     // Знаходимо реєстрації користувача
-    const userRegistrations = athleteRegistrations.filter(
+    const userRegistrations = coachJudgeRegistrations.filter(
       reg => reg.userId === session.user.id
     );
 
@@ -229,11 +240,11 @@ export async function GET(request: Request) {
       success: true,
       registrations: userRegistrations.map(reg => ({
         id: reg.id,
-        registrationNumber: `FUSAF-ATH-${reg.id.substr(-8).toUpperCase()}`,
+        registrationNumber: `FUSAF-CJ-${reg.id.substr(-8).toUpperCase()}`,
         status: reg.status,
         registrationDate: reg.registrationDate,
-        category: reg.category,
-        experience: reg.experience
+        preferredRole: reg.preferredRole,
+        specialization: reg.specialization
       }))
     });
 

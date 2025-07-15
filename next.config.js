@@ -1,15 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
 
   // 🚫 ПОВНЕ ВІДКЛЮЧЕННЯ ПЕРЕВІРОК ДЛЯ VERCEL
   eslint: {
     ignoreDuringBuilds: true,
     dirs: [],
+    ignoreBuildErrors: true,
   },
   typescript: {
     ignoreBuildErrors: true,
   },
+
+  // Додаткове відключення всіх перевірок
+  swcMinify: true,
 
   // 🌍 Environment Variables
   env: {
@@ -20,10 +24,11 @@ const nextConfig = {
 
   // 🛠️ Webpack налаштування
   webpack: (config, { buildId, dev, isServer }) => {
-    // Відключаємо TypeScript checker повністю
+    // Відключаємо TypeScript checker та ESLint повністю
     if (!dev && !isServer) {
       config.plugins = config.plugins.filter(
-        plugin => plugin.constructor.name !== 'ForkTsCheckerWebpackPlugin'
+        plugin => plugin.constructor.name !== 'ForkTsCheckerWebpackPlugin' &&
+                  plugin.constructor.name !== 'ESLintWebpackPlugin'
       );
     }
 

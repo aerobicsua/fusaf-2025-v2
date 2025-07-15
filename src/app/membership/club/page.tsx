@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -31,11 +32,12 @@ export default function ClubRegistrationPage() {
   const router = useRouter();
 
   const handleRegistration = () => {
+    // Перевіряємо авторизацію при натисканні кнопки реєстрації
     if (!session) {
-      router.push('/auth/signin');
+      router.push('/auth/signin?redirect=' + encodeURIComponent('/membership/club/registration'));
       return;
     }
-    router.push('/auth/role-selection?role=club_owner');
+    router.push('/membership/club/registration');
   };
 
   const benefits = [
@@ -310,7 +312,7 @@ export default function ClubRegistrationPage() {
 
             {!session && (
               <p className="text-sm opacity-75">
-                У вас немає акаунту? <Link href="/auth/signup" className="underline">Створіть безкоштовно</Link>
+                У вас немає акаунту? Його буде створено автоматично при вході.
               </p>
             )}
           </div>

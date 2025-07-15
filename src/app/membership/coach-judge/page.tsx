@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -24,11 +25,12 @@ export default function CoachJudgeMembershipPage() {
   const router = useRouter();
 
   const handleRegistration = () => {
+    // Перевіряємо авторизацію при натисканні кнопки реєстрації
     if (!session) {
-      router.push('/auth/signin');
+      router.push('/auth/signin?redirect=' + encodeURIComponent('/membership/coach-judge/registration'));
       return;
     }
-    router.push('/auth/role-selection?role=coach_judge');
+    router.push('/membership/coach-judge/registration');
   };
 
   const benefits = [

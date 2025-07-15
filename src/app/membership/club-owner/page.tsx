@@ -25,10 +25,10 @@ export default function ClubOwnerMembershipPage() {
 
   const handleRegistration = () => {
     if (!session) {
-      router.push('/auth/signin');
+      router.push('/auth/signin?redirect=' + encodeURIComponent('/membership/club/registration'));
       return;
     }
-    router.push('/auth/role-selection?role=club_owner');
+    router.push('/membership/club/registration');
   };
 
   const benefits = [

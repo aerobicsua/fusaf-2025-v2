@@ -274,11 +274,11 @@ export function Header() {
                   Вхід
                 </Button>
                 <Button
-                  onClick={() => router.push('/auth/signup')}
+                  onClick={() => router.push('/membership')}
                   className="bg-pink-600 hover:bg-pink-700 text-white"
                 >
                   <User className="mr-2 h-4 w-4" />
-                  Реєстрація
+                  Стати членом
                 </Button>
               </div>
             )}
@@ -338,11 +338,11 @@ export function Header() {
                       Вхід
                     </Button>
                     <Button
-                      onClick={() => router.push('/auth/signup')}
+                      onClick={() => router.push('/membership')}
                       className="w-full bg-pink-600 hover:bg-pink-700 text-white"
                     >
                       <User className="mr-2 h-4 w-4" />
-                      Реєстрація
+                      Стати членом
                     </Button>
                   </div>
                 )}
