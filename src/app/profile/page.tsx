@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,7 @@ interface UserProfile {
 
 export default function ProfilePage() {
   const { data: session, status, update } = useSession();
+  const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -79,7 +81,7 @@ export default function ProfilePage() {
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Доступ заборонено</h1>
             <p className="text-gray-600 mb-4">Увійдіть для перегляду профілю</p>
-            <Button onClick={() => window.location.href = '/'}>
+            <Button onClick={() => router.push('/')}>
               Повернутися на головну
             </Button>
           </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,9 +28,10 @@ import { Logo } from "@/components/Logo";
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { data: session, status } = useSession();
+  const router = useRouter();
 
   const handleSignIn = () => {
-    window.location.href = '/auth/signin';
+    router.push('/auth/signin');
   };
 
   const handleSignOut = () => {
@@ -258,7 +260,7 @@ export function Header() {
             ) : (
               <div className="hidden md:flex items-center space-x-2">
                 <Button
-                  onClick={() => window.location.href = '/auth/signin'}
+                  onClick={() => router.push('/auth/signin')}
                   variant="outline"
                   className="text-pink-600 border-pink-600 hover:bg-pink-50"
                 >
@@ -266,7 +268,7 @@ export function Header() {
                   Вхід
                 </Button>
                 <Button
-                  onClick={() => window.location.href = '/auth/signup'}
+                  onClick={() => router.push('/auth/signup')}
                   className="bg-pink-600 hover:bg-pink-700 text-white"
                 >
                   <User className="mr-2 h-4 w-4" />
@@ -322,7 +324,7 @@ export function Header() {
                 ) : (
                   <div className="space-y-2">
                     <Button
-                      onClick={() => window.location.href = '/auth/signin'}
+                      onClick={() => router.push('/auth/signin')}
                       variant="outline"
                       className="w-full text-pink-600 border-pink-600"
                     >
@@ -330,7 +332,7 @@ export function Header() {
                       Вхід
                     </Button>
                     <Button
-                      onClick={() => window.location.href = '/auth/signup'}
+                      onClick={() => router.push('/auth/signup')}
                       className="w-full bg-pink-600 hover:bg-pink-700 text-white"
                     >
                       <User className="mr-2 h-4 w-4" />

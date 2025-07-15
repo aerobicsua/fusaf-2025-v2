@@ -144,7 +144,9 @@ export default function CoachJudgeDashboard() {
   const [profile, setProfile] = useState(mockProfile);
 
   if (!user || !user.roles?.includes("coach_judge")) {
-    router.push("/auth/role-selection");
+    if (typeof window !== 'undefined') {
+      router.push("/auth/role-selection");
+    }
     return null;
   }
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -159,11 +160,7 @@ function RoleRequestsManager() {
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium">Активні запити ({requests.length})</h3>
         <Button
-          onClick={() => {
-            if (typeof window !== 'undefined') {
-              window.location.reload();
-            }
-          }}
+          onClick={() => router.refresh()}
           variant="outline"
           size="sm"
         >
@@ -237,6 +234,7 @@ function RoleRequestsManager() {
 
 export default function AdminPage() {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('overview');
 
   // Перевірка доступу
@@ -262,11 +260,7 @@ export default function AdminPage() {
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Доступ заборонено</h1>
             <p className="text-gray-600 mb-4">Увійдіть для доступу до адміністративної панелі</p>
-            <Button onClick={() => {
-              if (typeof window !== 'undefined') {
-                window.location.href = '/';
-              }
-            }}>
+            <Button onClick={() => router.push('/')}>
               Повернутися на головну
             </Button>
           </div>
@@ -289,11 +283,7 @@ export default function AdminPage() {
             <p className="text-gray-600 mb-4">
               Доступ до адміністративної панелі мають тільки адміністратори
             </p>
-            <Button onClick={() => {
-              if (typeof window !== 'undefined') {
-                window.location.href = '/';
-              }
-            }}>
+            <Button onClick={() => router.push('/')}>
               Повернутися на головну
             </Button>
           </div>
