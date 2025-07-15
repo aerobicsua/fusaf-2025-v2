@@ -103,37 +103,9 @@ export function Header() {
           <NavigationMenu className="hidden lg:flex">
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-gray-700 hover:text-pink-600">
+                <Link href="/membership" className="text-gray-700 hover:text-pink-600 px-4 py-2">
                   Членство
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="w-[400px] grid gap-3 p-4">
-                    <NavigationMenuLink asChild>
-                      <Link href="/membership/athletes" className="block p-3 rounded-lg hover:bg-gray-50 bg-blue-50">
-                        <div className="text-sm font-medium">🏆 Спортсмени</div>
-                        <div className="text-xs text-gray-500">Список зареєстрованих спортсменів</div>
-                      </Link>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
-                      <Link href="/membership/athlete" className="block p-3 rounded-lg hover:bg-gray-50">
-                        <div className="text-sm font-medium">Спортсмен</div>
-                        <div className="text-xs text-gray-500">Реєстрація для спортсменів</div>
-                      </Link>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
-                      <Link href="/membership/club-owner" className="block p-3 rounded-lg hover:bg-gray-50">
-                        <div className="text-sm font-medium">Власник клубу</div>
-                        <div className="text-xs text-gray-500">Реєстрація представників клубів</div>
-                      </Link>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
-                      <Link href="/membership/coach-judge" className="block p-3 rounded-lg hover:bg-gray-50">
-                        <div className="text-sm font-medium">Тренер/Суддя</div>
-                        <div className="text-xs text-gray-500">Реєстрація тренерів та суддів</div>
-                      </Link>
-                    </NavigationMenuLink>
-                  </div>
-                </NavigationMenuContent>
+                </Link>
               </NavigationMenuItem>
 
               <NavigationMenuItem>
