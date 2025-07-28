@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import { HybridStorage } from '@/lib/hybrid-storage';
 
 export async function GET() {
   try {
@@ -15,23 +14,15 @@ export async function GET() {
       );
     }
 
-    // Читаємо файл з запитами
-    const DATA_FILE = join(process.cwd(), 'data', 'role-requests.json');
-    let allRequests: any[] = [];
-
     console.log('🔍 Перевірка статусу для:', session.user.email);
-    console.log('📂 Шлях до файлу:', DATA_FILE);
-    console.log('📁 Файл існує:', existsSync(DATA_FILE));
 
+    let allRequests: any[] = [];
     try {
-      if (existsSync(DATA_FILE)) {
-        const data = readFileSync(DATA_FILE, 'utf8');
-        allRequests = JSON.parse(data);
-        console.log('📋 Завантажено запитів:', allRequests.length);
-        console.log('📝 Всі запити:', allRequests.map(r => ({ email: r.userEmail, role: r.requestedRole, status: r.status })));
-      }
+      allRequests = HybridStorage.getAll('role-requests');
+      console.log('📋 Завантажено запитів:', allRequests.length);
+      console.log('📝 Всі запити:', allRequests.map(r => ({ email: r.userEmail, role: r.requestedRole, status: r.status })));
     } catch (error) {
-      console.error('❌ Помилка читання файлу:', error);
+      console.error('❌ Помилка завантаження даних:', error);
     }
 
     // Шукаємо активний запит користувача
@@ -51,7 +42,6 @@ export async function GET() {
       roleRequest: userRequest || null,
       allRequestsCount: allRequests.length,
       debug: {
-        dataFileExists: existsSync(DATA_FILE),
         totalRequests: allRequests.length,
         userEmail: session.user.email
       }
